@@ -1,0 +1,33 @@
+{
+  "name": "nodejs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx babel src --out-dir dist --copy-files",
+    "task1": "nodemon src/basics/task1.js",
+    "task2": "nodemon src/basics/task2.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Artyom-Borushko/NodeJS.git"
+  },
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Artyom-Borushko/NodeJS/issues"
+  },
+  "homepage": "https://github.com/Artyom-Borushko/NodeJS#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.19.3",
+    "@babel/core": "^7.20.5",
+    "@babel/preset-env": "^7.20.2",
+    "babel-preset-minify": "^0.5.2",
+    "nodemon": "^2.0.20"
+  },
+  "dependencies": {
+    "core-js": "^3.26.1",
+    "csvtojson": "^2.0.10"
+  }
+}
