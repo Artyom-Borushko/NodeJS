@@ -12,11 +12,7 @@ const csvDelimiter = ';';
 
 
 async function createFolder(path) {
-    try {
-        await fsPromises.mkdir(path, { recursive: true })
-    } catch (error) {
-        console.error('Error creating folder', error.message);
-    }
+    await fsPromises.mkdir(path, { recursive: true })
 }
 
 async function csvToTxtPipeline() {
