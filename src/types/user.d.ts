@@ -9,4 +9,12 @@ interface User extends BaseUser {
     isDeleted: boolean;
 }
 
-export { BaseUser, User };
+interface UserDB {
+    login: string;
+    password: string;
+    age: number;
+    id: string;
+    isdeleted: boolean;
+}
+
+export { BaseUser, User, UserDB };
