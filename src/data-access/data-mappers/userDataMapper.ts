@@ -1,7 +1,7 @@
 import { EntityDataMapper } from './entityDataMapper.js';
 import { User, UserDB } from '../../types/user.js';
 
-class UserDataMapper extends EntityDataMapper {
+export class UserDataMapper extends EntityDataMapper {
     toDomain(userEntity: UserDB): User {
         const { isdeleted: isDeleted, ...restProps } = userEntity;
         return { isDeleted, ...restProps };
@@ -11,5 +11,3 @@ class UserDataMapper extends EntityDataMapper {
         return { isdeleted, ...restProps };
     }
 }
-
-export { UserDataMapper };

@@ -2,7 +2,7 @@ import { Model, InferAttributes, InferCreationAttributes, DataTypes } from 'sequ
 import { InitializeSequelize } from '../database/postgreSQL/initializeSequelize.js';
 
 
-class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttributes<UserModel>> {
+export class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttributes<UserModel>> {
     declare id: string;
     declare login: string;
     declare password: string;
@@ -34,5 +34,3 @@ UserModel.init({
     schema: 'public',
     sequelize: InitializeSequelize.getInstance()
 });
-
-export { UserModel };

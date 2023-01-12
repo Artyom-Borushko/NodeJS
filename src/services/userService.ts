@@ -3,7 +3,7 @@ import { UserRepository } from '../data-access/userRepository.js';
 import { UserUtilities } from '../utilities/userUtilities.js';
 
 
-class UserService {
+export class UserService {
     private userRepository: UserRepository;
     private readonly model;
     private readonly dataMapper;
@@ -39,5 +39,3 @@ class UserService {
         return this.userRepository.getAutoSuggestUsers(loginSubstring, limit);
     }
 }
-
-export { UserService };

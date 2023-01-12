@@ -2,7 +2,7 @@ import { Sequelize } from 'sequelize';
 import { sequelizeConnectionString } from './db.config.js';
 
 
-class InitializeSequelize {
+export class InitializeSequelize {
     private static instance: Sequelize;
     private placeholder: null;
     private constructor() {
@@ -19,5 +19,3 @@ class InitializeSequelize {
         return InitializeSequelize.instance;
     }
 }
-
-export { InitializeSequelize };

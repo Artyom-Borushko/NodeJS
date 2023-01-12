@@ -26,8 +26,8 @@ userRoute.route('/')
         if (loginSubstring && limit && !isNaN(parseInt(limit, 10))) {
             const suggestedUsers = await userService.getAutoSuggestUsers(loginSubstring, limit);
             if (!suggestedUsers.length) {
-                res.status(404)
-                    .json({ message: `Users with login substring ${req.query.login} not found` });
+                res.status(400)
+                    .json({ message: 'User can not be found' });
             } else {
                 res.status(200)
                     .json(suggestedUsers);
@@ -48,8 +48,8 @@ userRoute.route('/:id')
     .get((req: RequestWithUser, res: Response) => {
         const user: User | undefined = req.user;
         if (!user) {
-            res.status(404)
-                .json({ message: `User with id ${req.params.id} not found to retrieve` });
+            res.status(400)
+                .json({ message: 'User can not be found' });
         } else {
             res.status(200)
                 .json(user);
@@ -61,8 +61,8 @@ userRoute.route('/:id')
             const userUpdates: BaseUser = req.body;
             const id: string = req.params.id;
             if (!userToUpdate) {
-                res.status(404)
-                    .json({ message: `User with id ${req.params.id} not found to update` });
+                res.status(400)
+                    .json({ message: 'User can not be found' });
             } else {
                 const updatedUser = await userService.update(userUpdates, id);
                 res.status(200)
@@ -73,8 +73,8 @@ userRoute.route('/:id')
         const id: string = req.params.id;
         const userToDelete: User | undefined = req.user;
         if (!userToDelete) {
-            res.status(404)
-                .json({ message: `User with id ${req.params.id} not found to delete` });
+            res.status(400)
+                .json({ message: 'User can not be found' });
         } else {
             const deletedUser = await userService.delete(id, userToDelete);
             res.status(200)

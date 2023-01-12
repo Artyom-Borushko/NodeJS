@@ -3,7 +3,7 @@ import { BaseUser, User } from '../types/user.js';
 import { Op } from 'sequelize';
 
 
-class UserRepository {
+export class UserRepository {
     private model;
     private dataMapper;
 
@@ -55,5 +55,3 @@ class UserRepository {
         });
     }
 }
-
-export { UserRepository };

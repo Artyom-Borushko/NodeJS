@@ -1,9 +1,7 @@
 import crypto from 'crypto';
 
-class UserUtilities {
+export class UserUtilities {
     static generateUUID(): string {
         return crypto.randomUUID();
     }
 }
-
-export { UserUtilities };

@@ -3,7 +3,7 @@ import { ValidationErrorItem } from 'joi';
 import { userValidationSchema } from '../../validation-schemas/userValidationSchema.js';
 
 
-class UserValidation {
+export class UserValidation {
     private static errorResponse(schemaErrors: Array<ValidationErrorItem>) {
         const errors = schemaErrors.map((error) => {
             const { path, message } = error;
@@ -29,5 +29,3 @@ class UserValidation {
         };
     }
 }
-
-export { UserValidation };

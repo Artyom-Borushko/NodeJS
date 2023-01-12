@@ -1,7 +1,7 @@
 import { User } from '../types/user.js';
 
 
-const initialUsers: User[] = [
+export const initialUsers: User[] = [
     {
         'id': '11194250-2a76-46cf-ba67-62f69d30c26a',
         'isDeleted': false,
@@ -24,5 +24,3 @@ const initialUsers: User[] = [
         'age': 52
     }
 ];
-
-export { initialUsers };
