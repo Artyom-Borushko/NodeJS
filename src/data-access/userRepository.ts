@@ -62,9 +62,9 @@ export class UserRepository {
         return this.dataMapper.toDomain(deletedUser.toJSON());
     }
     async getAutoSuggestUsers(loginSubstring: string, limit: string): Promise<(User | undefined)[]> {
-        let retrievedUser;
+        let retrievedUsers;
         try {
-            retrievedUser = await this.model.findAll({
+            retrievedUsers = await this.model.findAll({
                 where: {
                     login: {
                         [Op.substring]: loginSubstring
@@ -78,7 +78,7 @@ export class UserRepository {
         } catch (e) {
             throw new DbError('Error retrieving auto suggested users list');
         }
-        return retrievedUser.map((user: any) => {
+        return retrievedUsers.map((user: any) => {
             return this.dataMapper.toDomain(user.toJSON());
         });
     }
