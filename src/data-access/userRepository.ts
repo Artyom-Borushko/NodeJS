@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { BaseUser, User } from '../types/user.js';
 import { Op } from 'sequelize';
+import { DbError } from '../errors/dbError.js';
 
 
 export class UserRepository {
@@ -13,43 +14,70 @@ export class UserRepository {
     }
 
     async get(id: string): Promise<User | undefined> {
-        const userFromDB = await this.model.findByPk(id);
+        let userFromDB;
+        try {
+            userFromDB = await this.model.findByPk(id);
+        } catch (e) {
+            throw new DbError('Error retrieving user');
+        }
         if (userFromDB) {
             return this.dataMapper.toDomain(userFromDB.toJSON());
         }
     }
-    async create(user: User): Promise<User> {
+    async create(user: User): Promise<User | undefined> {
+        let createdUser;
         const userToCreate = this.dataMapper.toDalEntity(user);
-        const createdUser = await this.model.create(userToCreate);
+        try {
+            createdUser = await this.model.create(userToCreate);
+        } catch (e) {
+            throw new DbError('Error creating user');
+        }
         return this.dataMapper.toDomain(createdUser.toJSON());
     }
     async update(userUpdates: BaseUser, id: string): Promise<User | undefined> {
-        const [rowsUpdate, [updatedUser]] = await this.model.update(userUpdates, {
-            returning: true,
-            where: { id }
-        });
+        let updatedUser;
+        let rowsUpdate;
+        try {
+            [rowsUpdate, [updatedUser]] = await this.model.update(userUpdates, {
+                returning: true,
+                where: { id }
+            });
+        } catch (e) {
+            throw new DbError('Error updating user');
+        }
         return this.dataMapper.toDomain(updatedUser.toJSON());
     }
     async delete(id: string, userToDelete: User): Promise<User | undefined> {
+        let deletedUser;
+        let rowsUpdate;
         const userUpdates = this.dataMapper.toDalEntity(userToDelete);
-        const [rowsUpdate, [deletedUser]] = await this.model.update(userUpdates, {
-            returning: true,
-            where: { id }
-        });
+        try {
+            [rowsUpdate, [deletedUser]] = await this.model.update(userUpdates, {
+                returning: true,
+                where: { id }
+            });
+        } catch (e) {
+            throw new DbError('Error deleting user');
+        }
         return this.dataMapper.toDomain(deletedUser.toJSON());
     }
     async getAutoSuggestUsers(loginSubstring: string, limit: string): Promise<(User | undefined)[]> {
-        const retrievedUser = await this.model.findAll({
-            where: {
-                login: {
-                    [Op.substring]: loginSubstring
-                }
-            },
-            order: [
-                ['login', 'ASC']
-            ],
-            limit
-        });
+        let retrievedUser;
+        try {
+            retrievedUser = await this.model.findAll({
+                where: {
+                    login: {
+                        [Op.substring]: loginSubstring
+                    }
+                },
+                order: [
+                    ['login', 'ASC']
+                ],
+                limit
+            });
+        } catch (e) {
+            throw new DbError('Error retrieving auto suggested users list');
+        }
         return retrievedUser.map((user: any) => {
             return this.dataMapper.toDomain(user.toJSON());
         });
