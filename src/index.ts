@@ -1,12 +1,12 @@
 import express, { Express } from 'express';
 import { userRoute } from './routers/userRoutes.js';
-import { ResourceNotFound } from './middlewares/error-handlers/resourceNotFound.js';
+import { ResourceNotFoundHandler } from './middlewares/error-handlers/resourceNotFoundHandler.js';
 import { InitializeSequelize } from './database/postgreSQL/initializeSequelize.js';
 import 'dotenv/config';
 import { errorHandler } from './middlewares/error-handlers/errorHandler.js';
 
 
-const notFoundHandler = new ResourceNotFound().notFoundHandler;
+const resourceNotFoundHandler = new ResourceNotFoundHandler().notFoundHandler;
 const app: Express = express();
 
 
@@ -21,4 +21,4 @@ app.use(express.json());
 app.use('/users', userRoute);
 
 app.use(errorHandler);
-app.use(notFoundHandler);
+app.use(resourceNotFoundHandler);
