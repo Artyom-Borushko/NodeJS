@@ -24,7 +24,7 @@ export class UserRepository {
             return this.dataMapper.toDomain(userFromDB.toJSON());
         }
     }
-    async create(user: User): Promise<User | undefined> {
+    async create(user: User): Promise<User> {
         let createdUser;
         const userToCreate = this.dataMapper.toDalEntity(user);
         try {
@@ -34,7 +34,7 @@ export class UserRepository {
         }
         return this.dataMapper.toDomain(createdUser.toJSON());
     }
-    async update(userUpdates: BaseUser, id: string): Promise<User | undefined> {
+    async update(userUpdates: BaseUser, id: string): Promise<User> {
         let updatedUser;
         let rowsUpdate;
         try {
@@ -47,7 +47,7 @@ export class UserRepository {
         }
         return this.dataMapper.toDomain(updatedUser.toJSON());
     }
-    async delete(id: string, userToDelete: User): Promise<User | undefined> {
+    async delete(id: string, userToDelete: User): Promise<User> {
         let deletedUser;
         let rowsUpdate;
         const userUpdates = this.dataMapper.toDalEntity(userToDelete);

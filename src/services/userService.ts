@@ -13,7 +13,7 @@ export class UserService {
         this.userRepository = new UserRepository(this.model, this.dataMapper);
     }
 
-    async create(user: BaseUser): Promise<User | undefined> {
+    async create(user: BaseUser): Promise<User> {
         const uuid = UserUtilities.generateUUID();
         const newUser: User = {
             id: uuid,
@@ -28,10 +28,10 @@ export class UserService {
             return user;
         }
     }
-    async update(userUpdates: BaseUser, id: string): Promise<User | undefined> {
+    async update(userUpdates: BaseUser, id: string): Promise<User> {
         return this.userRepository.update(userUpdates, id);
     }
-    async delete(id: string, userToDelete: User): Promise<User | undefined> {
+    async delete(id: string, userToDelete: User): Promise<User> {
         userToDelete.isDeleted = true;
         return this.userRepository.delete(id, userToDelete);
     }

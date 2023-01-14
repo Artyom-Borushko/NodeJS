@@ -7,25 +7,21 @@ import { UserValidation } from '../middlewares/validations/userValidation.js';
 import { UserModel } from '../models/userModel.js';
 import { UserDataMapper } from '../data-access/data-mappers/userDataMapper.js';
 import { UserNotFoundError } from '../errors/userNotFoundError.js';
+import { UserController } from '../controllers/userController.js';
+import { constants } from '../constants/constants.js';
 
 const userRoute: Router = express.Router();
 const userService = new UserService(UserModel, new UserDataMapper());
 const validation = new UserValidation();
+const userController = new UserController(userService);
 
 
 userRoute.route('/')
-    .post(validation.validateSchema(userValidationSchema),
-        async (req: Request, res: Response, next: NextFunction) => {
-            const user: BaseUser = req.body;
-            try {
-                const createdUser = await userService.create(user);
-                res.status(200)
-                    .json(createdUser);
-            } catch (e) {
-                next(e);
-                return;
-            }
-        })
+    .post(
+        validation.validateSchema(userValidationSchema),
+        userController.createHandler.bind(userController)
+    )
+
     .get(async (req: Request<unknown, unknown, unknown, ReqQuery>, res: Response, next: NextFunction) => {
         const loginSubstring: string | undefined = req.query.login;
         const limit: string | undefined = req.query.limit;
@@ -35,7 +31,7 @@ userRoute.route('/')
                 if (!suggestedUsers.length) {
                     throw new UserNotFoundError('User can not be found');
                 }
-                res.status(200)
+                res.status(constants.HTTP_SUCCESS)
                     .json(suggestedUsers);
             } catch (e) {
                 next(e);
@@ -65,7 +61,7 @@ userRoute.param('id', async (req: RequestWithUser, res: Response, next: NextFunc
 userRoute.route('/:id')
     .get((req: RequestWithUser, res: Response) => {
         const user = req.user;
-        res.status(200)
+        res.status(constants.HTTP_SUCCESS)
             .json(user);
     })
     .put(validation.validateSchema(userValidationSchema),
@@ -74,7 +70,7 @@ userRoute.route('/:id')
             const id: string = req.params.id;
             try {
                 const updatedUser = await userService.update(userUpdates, id);
-                res.status(200)
+                res.status(constants.HTTP_SUCCESS)
                     .json(updatedUser);
             } catch (e) {
                 next(e);
@@ -87,7 +83,7 @@ userRoute.route('/:id')
         try {
             if (userToDelete) {
                 const deletedUser = await userService.delete(id, userToDelete);
-                res.status(200)
+                res.status(constants.HTTP_SUCCESS)
                     .json(deletedUser);
             }
         } catch (e) {
