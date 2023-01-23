@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import { ValidationErrorItem } from 'joi';
 import { userValidationSchema } from '../../validation-schemas/userValidationSchema.js';
+import { UnprocessedEntityError } from '../../errors/unprocessedEntityError.js';
 
 
-class UserValidation {
+export class UserValidation {
     private static errorResponse(schemaErrors: Array<ValidationErrorItem>) {
         const errors = schemaErrors.map((error) => {
             const { path, message } = error;
@@ -16,18 +17,21 @@ class UserValidation {
     }
     validateSchema(schema: typeof userValidationSchema) {
         return (req: Request, res: Response, next: NextFunction) => {
-            const { error } = schema.validate(req.body, {
-                abortEarly: false,
-                allowUnknown: false
-            });
-            if (error && error.isJoi) {
-                res.status(400).json(UserValidation.errorResponse(error.details));
-            } else {
+            try {
+                const { error } = schema.validate(req.body, {
+                    abortEarly: false,
+                    allowUnknown: false
+                });
+                if (error && error.isJoi) {
+                    throw new UnprocessedEntityError('Unprocessed entity error',
+                        UserValidation.errorResponse(error.details));
+                }
                 next();
+                return;
+            } catch (e) {
+                next(e);
                 return;
             }
         };
     }
 }
-
-export { UserValidation };

@@ -1,55 +1,41 @@
-import crypto from 'crypto';
 import { BaseUser, User } from '../types/user.js';
-import { usersArray } from '../storage/localUsersStorage.js';
+import { UserRepository } from '../data-access/userRepository.js';
+import { UserUtilities } from '../utilities/userUtilities.js';
 
 
-class UserService {
-    private static generateUUID(): string {
-        return crypto.randomUUID();
+export class UserService {
+    private userRepository: UserRepository;
+    private readonly model;
+    private readonly dataMapper;
+    constructor(userModel: any, userDataMapper: any) {
+        this.model = userModel;
+        this.dataMapper = userDataMapper;
+        this.userRepository = new UserRepository(this.model, this.dataMapper);
     }
-    create(user: BaseUser): User {
-        const uuid = UserService.generateUUID();
-        const newUser = {
+
+    async create(user: BaseUser): Promise<User> {
+        const uuid = UserUtilities.generateUUID();
+        const newUser: User = {
             id: uuid,
             isDeleted: false,
             ...user
         };
-        usersArray.push(newUser);
-        return newUser;
+        return this.userRepository.create(newUser);
     }
-    get(id: string): User | undefined {
-        return usersArray.find(user => user.id.includes(id) && !user.isDeleted);
-    }
-    update(userUpdates: BaseUser, id: string): User {
-        const updateInstanceIndex = usersArray.findIndex(user => user.id === id);
-        if (updateInstanceIndex !== -1) {
-            usersArray[updateInstanceIndex] = {
-                id,
-                isDeleted: false,
-                ...userUpdates
-            };
-        }
-        return usersArray[updateInstanceIndex];
-    }
-    delete(id: string): void {
-        const deleteInstanceIndex = usersArray.findIndex(user => user.id === id);
-        if (deleteInstanceIndex !== -1) {
-            usersArray[deleteInstanceIndex] = {
-                ...usersArray[deleteInstanceIndex],
-                isDeleted: true
-            };
+    async get(id: string): Promise<User | undefined> {
+        const user = await this.userRepository.get(id);
+        if (user && !user.isDeleted) {
+            return user;
         }
     }
-    getAutoSuggestUsers(loginSubstring: string, limit: string): (User | undefined)[] {
-        const filteredUsers: User[] = usersArray.filter(user => user.login.includes(loginSubstring) && !user.isDeleted);
-        const sortedUsers: User[] = [...filteredUsers].sort((a, b) => {
-            const nameA = a.login.toLowerCase();
-            const nameB = b.login.toLowerCase();
-            if (nameA === nameB) return 0;
-            return nameA > nameB ? 1 : -1;
-        });
-        return sortedUsers.slice(0, parseInt(limit, 10));
+    async update(userUpdates: BaseUser, id: string): Promise<User> {
+        return this.userRepository.update(userUpdates, id);
+    }
+    async delete(id: string, userToDelete: User): Promise<User> {
+        userToDelete.isDeleted = true;
+        return this.userRepository.delete(id, userToDelete);
+    }
+    getAutoSuggestUsers(loginSubstring: string, limit: string): Promise<(User | undefined)[]> {
+        return this.userRepository.getAutoSuggestUsers(loginSubstring, limit);
     }
 }
-
-export { UserService };

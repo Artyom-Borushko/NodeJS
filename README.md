@@ -10,12 +10,13 @@ Scripts available in **package.json**.
 - `run:dev` - run app in development mode using nodemon
 - `lint` - displays lint errors
 - `lint:fix` - fix lint errors
+- `initPostgreDBTable` - create initial sequelize DB table
 
 ## Supported operations:
 
 - `POST` on the endpoint `/users` (create a new user)
 
-**Request example:**
+**Request body example:**
 ```
 {
     "login": "testlogin@gmail.com",
@@ -27,7 +28,7 @@ Scripts available in **package.json**.
 
 - `GET` on the endpoint `/users/:id` (get a specific user)
 
-**Response example:**
+**Response body example:**
 ```
 {
     "id": "9f25fa2a-b9f8-4d05-bab8-d52f8a78a5ba",
@@ -41,7 +42,7 @@ Scripts available in **package.json**.
 
 - `PUT` on the endpoint `/users/:id` (update the data for a specific user)
 
-**Request example:**
+**Request body example:**
 ```
 {
     "login": "updatedmail@gmail.com",
@@ -53,9 +54,15 @@ Scripts available in **package.json**.
 
 - `DELETE` on the endpoint `/users/:id` (remove a specific user)
 
-**Response headers example:**
+**Response body example:**
 ```
-status: 204 No Content
+{
+    "isDeleted": true,
+    "id": "e2dc0b98-8cca-4728-8800-8df2f702185b",
+    "login": "testloginC1@gmail.com",
+    "password": "testpassC1",
+    "age": 52
+}
 ```
 
 
@@ -65,7 +72,7 @@ status: 204 No Content
 ```
 http://localhost:3000/users/?login=test&limit=10
 ```
-**Response example:**
+**Response body example:**
 ```
 [
     {
