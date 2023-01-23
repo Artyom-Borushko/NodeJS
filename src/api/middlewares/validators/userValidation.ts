@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { ValidationErrorItem } from 'joi';
-import { userValidationSchema } from '../../validation-schemas/userValidationSchema.js';
-import { UnprocessedEntityError } from '../../errors/unprocessedEntityError.js';
+import { userValidationSchema } from '../../../validation-schemas/userValidationSchema.js';
+import { UnprocessedEntityError } from '../../../core/errors/unprocessedEntityError.js';
 
 
 export class UserValidation {

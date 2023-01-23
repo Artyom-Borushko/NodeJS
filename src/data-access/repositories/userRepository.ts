@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
-import { BaseUser, User } from '../types/user.js';
+import { BaseUser, User } from '../../types/user.js';
 import { Op } from 'sequelize';
-import { DbError } from '../errors/dbError.js';
+import { DbError } from '../../core/errors/dbError.js';
 
 
 export class UserRepository {
@@ -20,9 +20,7 @@ export class UserRepository {
         } catch (e) {
             throw new DbError('Error retrieving user');
         }
-        if (userFromDB) {
-            return this.dataMapper.toDomain(userFromDB.toJSON());
-        }
+        return userFromDB ? this.dataMapper.toDomain(userFromDB.toJSON()) : null;
     }
     async create(user: User): Promise<User> {
         let createdUser;

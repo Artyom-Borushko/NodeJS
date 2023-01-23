@@ -1,5 +1,5 @@
 import { BaseUser, User } from '../types/user.js';
-import { UserRepository } from '../data-access/userRepository.js';
+import { UserRepository } from '../data-access/repositories/userRepository.js';
 import { UserUtilities } from '../utilities/userUtilities.js';
 
 

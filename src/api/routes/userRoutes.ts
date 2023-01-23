@@ -1,14 +1,14 @@
 import express, { Request, Response, NextFunction, Router } from 'express';
-import { UserService } from '../services/userService.js';
-import { ReqQuery, RequestWithUser } from '../types/requests.js';
-import { BaseUser } from '../types/user.js';
-import { userValidationSchema } from '../validation-schemas/userValidationSchema.js';
-import { UserValidation } from '../middlewares/validations/userValidation.js';
-import { UserModel } from '../models/userModel.js';
-import { UserDataMapper } from '../data-access/data-mappers/userDataMapper.js';
-import { UserNotFoundError } from '../errors/userNotFoundError.js';
+import { UserService } from '../../services/userService.js';
+import { ReqQuery, RequestWithUser } from '../../types/requests.js';
+import { BaseUser } from '../../types/user.js';
+import { userValidationSchema } from '../../validation-schemas/userValidationSchema.js';
+import { UserValidation } from '../middlewares/validators/userValidation.js';
+import { UserModel } from '../../data-access/models/userModel.js';
+import { UserDataMapper } from '../../data-access/mappers/userDataMapper.js';
+import { UserNotFoundError } from '../../core/errors/userNotFoundError.js';
 import { UserController } from '../controllers/userController.js';
-import { constants } from '../constants/constants.js';
+import { constants } from '../../core/constants/constants.js';
 
 const userRoute: Router = express.Router();
 const userService = new UserService(UserModel, new UserDataMapper());
@@ -44,19 +44,7 @@ userRoute.route('/')
     });
 
 
-userRoute.param('id', async (req: RequestWithUser, res: Response, next: NextFunction) => {
-    try {
-        req.user = await userService.get(req.params.id);
-        if (!req.user) {
-            throw new UserNotFoundError('User can not be found');
-        }
-        next();
-        return;
-    } catch (e) {
-        next(e);
-        return;
-    }
-});
+userRoute.param('id', userController.getUserById.bind(userController));
 
 userRoute.route('/:id')
     .get((req: RequestWithUser, res: Response) => {

@@ -1,8 +1,8 @@
 
-interface Error {
+interface BaseError {
     statusCode?: number;
     message?: string;
     errorReason?: object | string;
 }
 
-export { Error };
+export { BaseError };

@@ -1,10 +1,9 @@
 import { Response } from 'express';
-import { constants } from '../constants/constants.js';
-import { User } from '../types/user.js';
+import { constants } from '../../core/constants/constants.js';
 
 
 export class BaseController {
-    success(res: Response, data: User): Response {
+    success(res: Response, data: object): Response {
         return res.status(constants.HTTP_SUCCESS)
             .json(data);
     }
