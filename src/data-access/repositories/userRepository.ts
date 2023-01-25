@@ -20,7 +20,7 @@ export class UserRepository {
         } catch (e) {
             throw new DbError('Error retrieving user');
         }
-        return userFromDB ? this.dataMapper.toDomain(userFromDB.toJSON()) : null;
+        return userFromDB ? this.dataMapper.toDomain(userFromDB.toJSON()) : undefined;
     }
     async create(user: User): Promise<User> {
         let createdUser;

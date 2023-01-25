@@ -4,7 +4,7 @@ import { UserService } from '../../services/userService.js';
 import { BaseUser } from '../../types/user.js';
 import { BaseController } from './baseController.js';
 import { UserDataMapper } from '../../data-access/mappers/userDataMapper.js';
-import { UserNotFoundError } from '../../core/errors/userNotFoundError.js';
+import { EntityNotFoundError } from '../../core/errors/entityNotFoundError.js';
 
 
 export class UserController extends BaseController {
@@ -30,7 +30,7 @@ export class UserController extends BaseController {
         try {
             req.user = await this.userService.get(req.params.id);
             if (!req.user) {
-                throw new UserNotFoundError('User can not be found');
+                throw new EntityNotFoundError('User can not be found');
             }
             next();
             return;

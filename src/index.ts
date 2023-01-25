@@ -1,5 +1,6 @@
 import express, { Express } from 'express';
 import { userRoute } from './api/routes/userRoutes.js';
+import { groupRoute } from './api/routes/groupRoutes.js';
 import { ResourceNotFoundHandler } from './api/middlewares/error-handlers/resourceNotFoundHandler.js';
 import { InitializeSequelize } from './database/postgreSQL/initializeSequelize.js';
 import 'dotenv/config';
@@ -19,6 +20,7 @@ InitializeSequelize.getInstance().authenticate()
 
 app.use(express.json());
 app.use('/users', userRoute);
+app.use('/groups', groupRoute);
 
 app.use(errorHandler);
 app.use(resourceNotFoundHandler);
