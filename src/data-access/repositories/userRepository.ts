@@ -4,47 +4,27 @@ import { Op, Transaction } from 'sequelize';
 import { DbError } from '../../core/errors/dbError.js';
 import { UserGroupModel } from '../models/userGroupModel.js';
 import { InitializeSequelize } from '../../database/postgreSQL/initializeSequelize.js';
+import { BaseRepository } from './baseRepository.js';
 
 
-export class UserRepository {
-    private model;
-    private dataMapper;
-
+export class UserRepository extends BaseRepository {
     constructor(userModel: any, userDataMapper: any) {
+        super(userModel, userDataMapper);
         this.model = userModel;
         this.dataMapper = userDataMapper;
     }
 
     async get(id: string): Promise<User | undefined> {
-        let userFromDB;
-        try {
-            userFromDB = await this.model.findByPk(id);
-        } catch (e) {
-            throw new DbError('Error retrieving user');
-        }
+        const userFromDB = await super.getEntityById(id);
         return userFromDB ? this.dataMapper.toDomain(userFromDB.toJSON()) : undefined;
     }
     async create(user: User): Promise<User> {
-        let createdUser;
         const userToCreate = this.dataMapper.toDalEntity(user);
-        try {
-            createdUser = await this.model.create(userToCreate);
-        } catch (e) {
-            throw new DbError('Error creating user');
-        }
+        const createdUser = await super.createEntity(userToCreate);
         return this.dataMapper.toDomain(createdUser.toJSON());
     }
     async update(userUpdates: BaseUser, id: string): Promise<User> {
-        let updatedUser;
-        let rowsUpdate;
-        try {
-            [rowsUpdate, [updatedUser]] = await this.model.update(userUpdates, {
-                returning: true,
-                where: { id }
-            });
-        } catch (e) {
-            throw new DbError('Error updating user');
-        }
+        const updatedUser = await super.updateEntityById(userUpdates, id);
         return this.dataMapper.toDomain(updatedUser.toJSON());
     }
     async delete(id: string, userToDelete: User): Promise<User> {

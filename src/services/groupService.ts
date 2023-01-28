@@ -26,7 +26,7 @@ export class GroupService {
     async get(id: string): Promise<Group | undefined> {
         return await this.groupRepository.get(id);
     }
-    async getAll(): Promise<Group | undefined> {
+    async getAll(): Promise<Array<Group | undefined>> {
         return await this.groupRepository.getAll();
     }
     async update(groupUpdates: BaseGroup, id: string): Promise<Group> {
