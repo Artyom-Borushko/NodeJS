@@ -11,9 +11,14 @@ interface RequestWithGroup extends Request {
     group?: Group;
 }
 
+interface AddUsersToGroupRequest extends Request {
+    groupId?: string;
+    usersIds?: Array<string>;
+}
+
 interface ReqQuery {
     login?: string;
     limit?: string;
 }
 
-export { RequestWithUser, ReqQuery, RequestWithGroup };
+export { RequestWithUser, ReqQuery, RequestWithGroup, AddUsersToGroupRequest };

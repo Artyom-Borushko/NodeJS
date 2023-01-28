@@ -5,9 +5,10 @@ import { GroupController } from '../controllers/groupController.js';
 import { GroupService } from '../../services/groupService.js';
 import { GroupModel } from '../../data-access/models/groupModel.js';
 import { GroupDataMapper } from '../../data-access/mappers/groupDataMapper.js';
-import { RequestWithGroup } from '../../types/requests.js';
+import { RequestWithGroup, AddUsersToGroupRequest } from '../../types/requests.js';
 import { constants } from '../../core/constants/constants.js';
 import { BaseGroup } from '../../types/group.js';
+import { usersToGroupValidationSchema } from '../../validation-schemas/usersToGroupValidationSchema.js';
 
 const groupRoute: Router = express.Router();
 const validation = new JoiValidation();
@@ -59,5 +60,20 @@ groupRoute.route('/:id')
             return;
         }
     });
+
+groupRoute.route('/addUsers')
+    .post(validation.validateSchema(usersToGroupValidationSchema),
+        async (req: AddUsersToGroupRequest, res: Response, next: NextFunction) => {
+            const groupId = req.body.groupId;
+            const userIds = req.body.usersIds;
+            try {
+                const group = await groupService.addUsersToGroup(groupId, userIds);
+                res.status(constants.HTTP_SUCCESS)
+                    .json(group);
+            } catch (e) {
+                next(e);
+                return;
+            }
+        });
 
 export { groupRoute };

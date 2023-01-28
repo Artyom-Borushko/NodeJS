@@ -1,7 +1,9 @@
 /* eslint-disable no-unused-vars */
 import { BaseUser, User } from '../../types/user.js';
-import { Op } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import { DbError } from '../../core/errors/dbError.js';
+import { UserGroupModel } from '../models/userGroupModel.js';
+import { InitializeSequelize } from '../../database/postgreSQL/initializeSequelize.js';
 
 
 export class UserRepository {
@@ -50,14 +52,27 @@ export class UserRepository {
         let rowsUpdate;
         const userUpdates = this.dataMapper.toDalEntity(userToDelete);
         try {
-            [rowsUpdate, [deletedUser]] = await this.model.update(userUpdates, {
-                returning: true,
-                where: { id }
+            return InitializeSequelize.getInstance().transaction(async (t: Transaction) => {
+                [rowsUpdate, [deletedUser]] = await this.model.update(userUpdates, {
+                    returning: true,
+                    where: { id },
+                    transaction: t
+                });
+                const userEntriesFromDB = await UserGroupModel.findAll({
+                    where: { UserId: id },
+                    transaction: t
+                });
+                for (const userEntry of userEntriesFromDB) {
+                    await UserGroupModel.destroy({
+                        where: { UserId: id },
+                        transaction: t
+                    });
+                }
+                return deletedUser;
             });
         } catch (e) {
             throw new DbError('Error deleting user');
         }
-        return this.dataMapper.toDomain(deletedUser.toJSON());
     }
     async getAutoSuggestUsers(loginSubstring: string, limit: string): Promise<(User | undefined)[]> {
         let retrievedUsers;

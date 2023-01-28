@@ -5,6 +5,7 @@ import { ResourceNotFoundHandler } from './api/middlewares/error-handlers/resour
 import { InitializeSequelize } from './database/postgreSQL/initializeSequelize.js';
 import 'dotenv/config';
 import { errorHandler } from './api/middlewares/error-handlers/errorHandler.js';
+import { EntityRelationshipsInitializer } from './database/postgreSQL/entityRelationshipsInitializer.js';
 
 
 const resourceNotFoundHandler = new ResourceNotFoundHandler().notFoundHandler;
@@ -13,7 +14,11 @@ const app: Express = express();
 
 app.listen(process.env.PORT);
 InitializeSequelize.getInstance().authenticate()
-    .then(() => console.info('Connection to DB is working'))
+    .then(() => {
+        console.info('Connection to DB is working');
+        EntityRelationshipsInitializer.init();
+        InitializeSequelize.getInstance().sync();
+    })
     .catch(() => {
         throw 'DB connection error';
     });
