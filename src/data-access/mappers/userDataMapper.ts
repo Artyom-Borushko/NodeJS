@@ -11,4 +11,8 @@ export class UserDataMapper extends EntityDataMapper {
         const { isDeleted: isdeleted, ...restProps } = user;
         return { isdeleted, ...restProps };
     }
+    static toClient(user: User): User {
+        const { isDeleted, id, age, password, login } = user;
+        return { isDeleted, id, age, password, login };
+    }
 }

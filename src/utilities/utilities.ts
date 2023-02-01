@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-export class UserUtilities {
+export class Utilities {
     static generateUUID(): string {
         return crypto.randomUUID();
     }

@@ -1,6 +1,6 @@
 import { BaseUser, User } from '../types/user.js';
-import { UserRepository } from '../data-access/userRepository.js';
-import { UserUtilities } from '../utilities/userUtilities.js';
+import { UserRepository } from '../data-access/repositories/userRepository.js';
+import { Utilities } from '../utilities/utilities.js';
 
 
 export class UserService {
@@ -14,7 +14,7 @@ export class UserService {
     }
 
     async create(user: BaseUser): Promise<User> {
-        const uuid = UserUtilities.generateUUID();
+        const uuid = Utilities.generateUUID();
         const newUser: User = {
             id: uuid,
             isDeleted: false,

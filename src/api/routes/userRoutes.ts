@@ -1,18 +1,18 @@
 import express, { Request, Response, NextFunction, Router } from 'express';
-import { UserService } from '../services/userService.js';
-import { ReqQuery, RequestWithUser } from '../types/requests.js';
-import { BaseUser } from '../types/user.js';
-import { userValidationSchema } from '../validation-schemas/userValidationSchema.js';
-import { UserValidation } from '../middlewares/validations/userValidation.js';
-import { UserModel } from '../models/userModel.js';
-import { UserDataMapper } from '../data-access/data-mappers/userDataMapper.js';
-import { UserNotFoundError } from '../errors/userNotFoundError.js';
+import { UserService } from '../../services/userService.js';
+import { ReqQuery, RequestWithUser } from '../../types/requests.js';
+import { BaseUser } from '../../types/user.js';
+import { userValidationSchema } from '../../validation-schemas/userValidationSchema.js';
+import { JoiValidation } from '../middlewares/validators/joiValidation.js';
+import { UserModel } from '../../data-access/models/userModel.js';
+import { UserDataMapper } from '../../data-access/mappers/userDataMapper.js';
+import { EntityNotFoundError } from '../../core/errors/entityNotFoundError.js';
 import { UserController } from '../controllers/userController.js';
-import { constants } from '../constants/constants.js';
+import { constants } from '../../core/constants/constants.js';
 
 const userRoute: Router = express.Router();
 const userService = new UserService(UserModel, new UserDataMapper());
-const validation = new UserValidation();
+const validation = new JoiValidation();
 const userController = new UserController(userService);
 
 
@@ -29,7 +29,7 @@ userRoute.route('/')
             try {
                 const suggestedUsers = await userService.getAutoSuggestUsers(loginSubstring, limit);
                 if (!suggestedUsers.length) {
-                    throw new UserNotFoundError('User can not be found');
+                    throw new EntityNotFoundError('User can not be found');
                 }
                 res.status(constants.HTTP_SUCCESS)
                     .json(suggestedUsers);
@@ -44,19 +44,7 @@ userRoute.route('/')
     });
 
 
-userRoute.param('id', async (req: RequestWithUser, res: Response, next: NextFunction) => {
-    try {
-        req.user = await userService.get(req.params.id);
-        if (!req.user) {
-            throw new UserNotFoundError('User can not be found');
-        }
-        next();
-        return;
-    } catch (e) {
-        next(e);
-        return;
-    }
-});
+userRoute.param('id', userController.getUserById.bind(userController));
 
 userRoute.route('/:id')
     .get((req: RequestWithUser, res: Response) => {
