@@ -1,24 +1,33 @@
 import { DbError } from '../../core/errors/dbError.js';
-import { Model } from 'sequelize';
+import { Model, Transaction } from 'sequelize';
 
 
 export class BaseRepository {
-    constructor(
-        protected model: any,
-        protected dataMapper: any
-    ) {
+    constructor(protected model: any) {
         this.model = model;
-        this.dataMapper = dataMapper;
     }
-    async getEntityById(entityId: string): Promise<Model> {
+    async getEntityById(entityId: string, transaction?: Transaction): Promise<Model> {
         try {
+            if (transaction) {
+                return await this.model.findByPk(entityId, { transaction });
+            }
             return await this.model.findByPk(entityId);
         } catch (e) {
             throw new DbError('Error retrieving entity');
         }
     }
-    async createEntity(entityToCreate: object): Promise<Model> {
+    async getAllEntitiesByParams(query: object): Promise<Array<Model>> {
         try {
+            return await this.model.findAll(query);
+        } catch (e) {
+            throw new DbError('Error retrieving entities');
+        }
+    }
+    async createEntity(entityToCreate: object, transaction?: Transaction): Promise<Model> {
+        try {
+            if (transaction) {
+                return await this.model.create(entityToCreate, { transaction });
+            }
             return await this.model.create(entityToCreate);
         } catch (e) {
             throw new DbError('Error creating entity');
@@ -38,13 +47,20 @@ export class BaseRepository {
             throw new DbError('Error updating entity');
         }
     }
-    async deleteEntity(entityId: string): Promise<void> {
+    async deleteEntity(entityId: string): Promise<number> {
         try {
-            await this.model.destroy({
+            return await this.model.destroy({
                 where: {
                     id: entityId
                 }
             });
+        } catch (e) {
+            throw new DbError('Error deleting entity');
+        }
+    }
+    async deleteEntityByParams(query: object): Promise<number> {
+        try {
+            return await this.model.destroy(query);
         } catch (e) {
             throw new DbError('Error deleting entity');
         }

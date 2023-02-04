@@ -1,27 +1,29 @@
 import { DbError } from '../../core/errors/dbError.js';
-import { BaseGroup, Group } from '../../types/group.js';
+import { BaseGroupDB, GroupDB } from '../../types/group.js';
 import { UserModel } from '../models/userModel.js';
-import { InitializeSequelize } from '../../database/postgreSQL/initializeSequelize.js';
 import { Model, Transaction } from 'sequelize';
 import { BaseRepository } from './baseRepository.js';
+import { UserRepository } from './userRepository.js';
+import { GroupModel } from '../models/groupModel.js';
+import { UserGroupModel } from '../models/userGroupModel.js';
+import { UserGroupRepository } from './userGroupRepository.js';
 
 
 export class GroupRepository extends BaseRepository {
-    constructor(groupModel: any, groupDataMapper: any) {
-        super(groupModel, groupDataMapper);
-        this.model = groupModel;
-        this.dataMapper = groupDataMapper;
+    constructor(groupModel: typeof GroupModel, private userRepository: UserRepository,
+                private userGroupModel: typeof UserGroupModel, private userGroupRepository: UserGroupRepository) {
+        super(groupModel);
+        this.userRepository = userRepository;
+        this.userGroupModel = userGroupModel;
+        this.userGroupRepository = userGroupRepository;
     }
 
-    async get(id: string): Promise<Group | undefined> {
-        const groupFromDB = await super.getEntityById(id);
-        return groupFromDB ? this.dataMapper.toDomain(groupFromDB.toJSON()) : undefined;
+    async get(id: string): Promise<Model<GroupDB> | undefined> {
+        return await super.getEntityById(id);
     }
-
-    async getAll(): Promise<Array<Group | undefined>> {
-        let groupsFromDB;
+    async getAll(): Promise<Array<Model<GroupDB> | undefined>> {
         try {
-            groupsFromDB = await this.model.findAll({
+            return await this.model.findAll({
                 include: [
                     {
                         model: UserModel,
@@ -36,42 +38,34 @@ export class GroupRepository extends BaseRepository {
         } catch (e) {
             throw new DbError('Error retrieving group');
         }
-        return groupsFromDB.map((group: Model) => {
-            return this.dataMapper.toDomain(group.toJSON());
-        });
     }
-    async create(group: Group): Promise<Group> {
-        const groupToCreate = this.dataMapper.toDalEntity(group);
-        const createdGroup = await super.createEntity(groupToCreate);
-        return this.dataMapper.toDomain(createdGroup.toJSON());
+    async create(group: GroupDB): Promise<Model<GroupDB>> {
+        return await super.createEntity(group);
     }
-    async update(groupUpdates: BaseGroup, id: string): Promise<Group> {
-        const groupToUpdate = this.dataMapper.toDalEntity(groupUpdates);
-        const updatedGroup = await super.updateEntityById(groupToUpdate, id);
-        return this.dataMapper.toDomain(updatedGroup.toJSON());
+    async update(groupUpdates: BaseGroupDB, id: string): Promise<Model<GroupDB>> {
+        return await super.updateEntityById(groupUpdates, id);
     }
-    async delete(id: string, groupToDelete: Group): Promise<Group> {
-        await super.deleteEntity(id);
-        return groupToDelete;
+    async delete(id: string): Promise<void> {
+        const rowDeleted = await super.deleteEntity(id);
+        if (rowDeleted !== 1) {
+            throw new DbError('Error deleting user');
+        }
     }
-
-    async addUsersToGroup(groupId: string, userIds: Array<string>): Promise<Group | undefined> {
+    async addUsersToGroup(groupId: string, userIds: Array<string>, transaction: Transaction): Promise<Model<GroupDB>> {
         try {
-            return InitializeSequelize.getInstance().transaction(async (t: Transaction) => {
-                const groupFromDB = await this.model.findByPk(groupId, { transaction: t });
-                if (groupFromDB) {
-                    for (const userId of userIds) {
-                        const userFromDB = await UserModel.findByPk(userId, { transaction: t });
-                        if (userFromDB && !userFromDB.toJSON().isdeleted) {
-                            await groupFromDB.addUser(userFromDB, { transaction: t });
-                        } else {
-                            throw new DbError('Error retrieving user');
-                        }
+            const groupFromDB = await this.model.findByPk(groupId, { transaction });
+            if (groupFromDB) {
+                for (const userId of userIds) {
+                    const userFromDB = await this.userRepository.get(userId, transaction);
+                    if (userFromDB && !userFromDB.toJSON().isdeleted) {
+                        await this.userGroupRepository.addUserToGroup(groupId, userId, transaction);
+                    } else {
+                        throw new DbError('Error retrieving user');
                     }
-                    return this.dataMapper.toDomain(groupFromDB.toJSON());
                 }
-                throw new DbError('Error retrieving group');
-            });
+                return groupFromDB;
+            }
+            throw new DbError('Error retrieving group');
         } catch (e) {
             throw new DbError('Error adding users to group');
         }
