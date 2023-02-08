@@ -6,6 +6,7 @@ import { BaseController } from './baseController.js';
 import { UserDataMapper } from '../../data-access/mappers/userDataMapper.js';
 import { EntityNotFoundError } from '../../core/errors/entityNotFoundError.js';
 import { InitializeSequelize } from '../../database/postgreSQL/initializeSequelize.js';
+import { Logger } from '../../utilities/logger.js';
 
 
 export class UserController extends BaseController {
@@ -22,6 +23,8 @@ export class UserController extends BaseController {
             const createdUser = await this.userService.create(user);
             this.success(res, UserDataMapper.toClient(createdUser));
         } catch (e) {
+            Logger.logControllerError('error', 'createUser', 'Unable to create user',
+                { req, res, next });
             next(e);
             return;
         }
@@ -34,6 +37,8 @@ export class UserController extends BaseController {
             }
             this.success(res, UserDataMapper.toClient(user));
         } catch (e) {
+            Logger.logControllerError('error', 'getUser', 'Unable to get user',
+                { req, res, next });
             next(e);
             return;
         }
@@ -45,6 +50,8 @@ export class UserController extends BaseController {
             const updatedUser = await this.userService.update(userUpdates, id);
             this.success(res, UserDataMapper.toClient(updatedUser));
         } catch (e) {
+            Logger.logControllerError('error', 'updateUser', 'Unable to update user',
+                { req, res, next });
             next(e);
             return;
         }
@@ -61,6 +68,8 @@ export class UserController extends BaseController {
             }
         } catch (e) {
             await transaction.rollback();
+            Logger.logControllerError('error', 'deleteUser', 'Unable to delete user',
+                { req, res, next });
             next(e);
             return;
         }
@@ -76,6 +85,8 @@ export class UserController extends BaseController {
                 }
                 this.success(res, suggestedUsers);
             } catch (e) {
+                Logger.logControllerError('error', 'getAutoSuggestUsers', 'Unable to get auto suggest users',
+                    { req, res, next });
                 next(e);
                 return;
             }
