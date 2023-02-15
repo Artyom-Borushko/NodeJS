@@ -5,6 +5,5 @@ export const constants = {
     WRITE: 'WRITE',
     DELETE: 'DELETE',
     SHARE: 'SHARE',
-    UPLOAD: 'UPLOAD_FILES',
-    SECRET: 'a1f68fbefc78865'
+    UPLOAD: 'UPLOAD_FILES'
 } as const;

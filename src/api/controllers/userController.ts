@@ -9,7 +9,7 @@ import { InitializeSequelize } from '../../database/postgreSQL/initializeSequeli
 import { Logger } from '../../utilities/logger.js';
 import { UnauthorizedError } from '../../core/errors/unauthorizedError.js';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { constants } from '../../core/constants/constants.js';
+import { authenticationConfig } from '../../core/configs/authentication.config.js';
 
 
 export class UserController extends BaseController {
@@ -107,7 +107,7 @@ export class UserController extends BaseController {
                 throw new UnauthorizedError('Invalid username or password');
             }
             const payload: JwtPayload = { sub: user.id };
-            const token = jwt.sign(payload, constants.SECRET, { expiresIn: 300 });
+            const token = jwt.sign(payload, authenticationConfig.secret, { expiresIn: authenticationConfig.tokenLife });
             res.json({ token });
         } catch (e) {
             next(e);
