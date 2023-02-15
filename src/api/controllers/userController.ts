@@ -7,6 +7,9 @@ import { UserDataMapper } from '../../data-access/mappers/userDataMapper.js';
 import { EntityNotFoundError } from '../../core/errors/entityNotFoundError.js';
 import { InitializeSequelize } from '../../database/postgreSQL/initializeSequelize.js';
 import { Logger } from '../../utilities/logger.js';
+import { UnauthorizedError } from '../../core/errors/unauthorizedError.js';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import { constants } from '../../core/constants/constants.js';
 
 
 export class UserController extends BaseController {
@@ -92,6 +95,22 @@ export class UserController extends BaseController {
             }
         } else {
             next();
+            return;
+        }
+    }
+    async authenticateUser(req: RequestWithUser, res: Response, next: NextFunction) {
+        const login: string = req.body.login;
+        const password: string = req.body.password;
+        try {
+            const user = await this.userService.getByLoginAndPassword({ login, password });
+            if (!user) {
+                throw new UnauthorizedError('Invalid username or password');
+            }
+            const payload: JwtPayload = { sub: user.id };
+            const token = jwt.sign(payload, constants.SECRET, { expiresIn: 300 });
+            res.json({ token });
+        } catch (e) {
+            next(e);
             return;
         }
     }

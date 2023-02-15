@@ -16,6 +16,13 @@ export class BaseRepository {
             throw new DbError('Error retrieving entity');
         }
     }
+    async getEntityByParams(query: object): Promise<Model> {
+        try {
+            return await this.model.findOne(query);
+        } catch (e) {
+            throw new DbError('Error retrieving entity');
+        }
+    }
     async getAllEntitiesByParams(query: object): Promise<Array<Model>> {
         try {
             return await this.model.findAll(query);

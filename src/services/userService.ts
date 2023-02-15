@@ -1,4 +1,4 @@
-import { BaseUser, User, UserDB } from '../types/user.js';
+import { BaseUser, User, UserAuth, UserDB } from '../types/user.js';
 import { UserRepository } from '../data-access/repositories/userRepository.js';
 import { Utilities } from '../utilities/utilities.js';
 import { UserDataMapper } from '../data-access/mappers/userDataMapper.js';
@@ -52,5 +52,12 @@ export class UserService {
         return retrievedUsers.map((user: Model<UserDB> | undefined) => {
             if (user) return this.dataMapper.toDomain(user.toJSON());
         });
+    }
+    async getByLoginAndPassword(params: UserAuth): Promise<User | undefined> {
+        const userFromDB = await this.userRepository.getByLoginAndPassword(params);
+        if (userFromDB) {
+            const userDTO = this.dataMapper.toDomain(userFromDB.toJSON());
+            return !userDTO.isDeleted ? userDTO : undefined;
+        }
     }
 }
