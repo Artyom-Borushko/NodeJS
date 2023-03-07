@@ -17,4 +17,9 @@ interface UserDB {
     isdeleted: boolean;
 }
 
-export { BaseUser, User, UserDB };
+interface UserAuth {
+    login: string;
+    password: string;
+}
+
+export { BaseUser, User, UserDB, UserAuth };

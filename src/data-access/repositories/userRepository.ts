@@ -1,60 +1,61 @@
 /* eslint-disable no-unused-vars */
-import { BaseUser, User } from '../../types/user.js';
-import { Op, Transaction } from 'sequelize';
+import { BaseUser, UserAuth, UserDB } from '../../types/user.js';
+import { Model, Op, Transaction } from 'sequelize';
 import { DbError } from '../../core/errors/dbError.js';
-import { UserGroupModel } from '../models/userGroupModel.js';
-import { InitializeSequelize } from '../../database/postgreSQL/initializeSequelize.js';
 import { BaseRepository } from './baseRepository.js';
+import { UserModel } from '../models/userModel.js';
+import { UserGroupRepository } from './userGroupRepository.js';
 
 
 export class UserRepository extends BaseRepository {
-    constructor(userModel: any, userDataMapper: any) {
-        super(userModel, userDataMapper);
+    constructor(userModel: typeof UserModel, private userGroupRepository: UserGroupRepository) {
+        super(userModel);
         this.model = userModel;
-        this.dataMapper = userDataMapper;
+        this.userGroupRepository = userGroupRepository;
     }
 
-    async get(id: string): Promise<User | undefined> {
-        const userFromDB = await super.getEntityById(id);
-        return userFromDB ? this.dataMapper.toDomain(userFromDB.toJSON()) : undefined;
+    async get(id: string, transaction?: Transaction): Promise<Model<UserDB> | undefined> {
+        return await super.getEntityById(id, transaction);
     }
-    async create(user: User): Promise<User> {
-        const userToCreate = this.dataMapper.toDalEntity(user);
-        const createdUser = await super.createEntity(userToCreate);
-        return this.dataMapper.toDomain(createdUser.toJSON());
+    async getByLoginAndPassword(params: UserAuth): Promise<Model<UserDB> | undefined> {
+        return await super.getEntityByParams({
+            where: {
+                login: params.login,
+                password: params.password
+            }
+        });
     }
-    async update(userUpdates: BaseUser, id: string): Promise<User> {
-        const updatedUser = await super.updateEntityById(userUpdates, id);
-        return this.dataMapper.toDomain(updatedUser.toJSON());
+    async create(user: UserDB): Promise<Model<UserDB>> {
+        return await super.createEntity(user);
     }
-    async delete(id: string, userToDelete: User): Promise<User> {
+    async update(userUpdates: BaseUser, id: string): Promise<Model<UserDB>> {
+        return await super.updateEntityById(userUpdates, id);
+    }
+    async delete(id: string, userUpdates: UserDB, transaction: Transaction): Promise<Model<UserDB>> {
         let deletedUser;
         let rowsUpdate;
-        const userUpdates = this.dataMapper.toDalEntity(userToDelete);
         try {
-            return InitializeSequelize.getInstance().transaction(async (t: Transaction) => {
-                [rowsUpdate, [deletedUser]] = await this.model.update(userUpdates, {
-                    returning: true,
-                    where: { id },
-                    transaction: t
-                });
-                const userEntriesFromDB = await UserGroupModel.findAll({
-                    where: { UserId: id },
-                    transaction: t
-                });
-                for (const userEntry of userEntriesFromDB) {
-                    await UserGroupModel.destroy({
-                        where: { UserId: id },
-                        transaction: t
-                    });
-                }
-                return deletedUser;
+            [rowsUpdate, [deletedUser]] = await this.model.update(userUpdates, {
+                returning: true,
+                where: { id },
+                transaction
             });
+            const userEntriesFromDB = await this.userGroupRepository.getAllEntitiesByParams({
+                where: { UserId: id },
+                transaction
+            });
+            for (const userEntry of userEntriesFromDB) {
+                await this.userGroupRepository.deleteEntityByParams({
+                    where: { UserId: id },
+                    transaction
+                });
+            }
+            return deletedUser;
         } catch (e) {
             throw new DbError('Error deleting user');
         }
     }
-    async getAutoSuggestUsers(loginSubstring: string, limit: string): Promise<(User | undefined)[]> {
+    async getAutoSuggestUsers(loginSubstring: string, limit: string): Promise<Array<Model<UserDB> | undefined>> {
         let retrievedUsers;
         try {
             retrievedUsers = await this.model.findAll({
@@ -71,8 +72,6 @@ export class UserRepository extends BaseRepository {
         } catch (e) {
             throw new DbError('Error retrieving auto suggested users list');
         }
-        return retrievedUsers.map((user: any) => {
-            return this.dataMapper.toDomain(user.toJSON());
-        });
+        return retrievedUsers;
     }
 }

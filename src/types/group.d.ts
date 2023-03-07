@@ -1,4 +1,7 @@
-type Permission = 'READ' | 'WRITE' | 'DELETE' | 'SHARE' | 'UPLOAD_FILES';
+import { constants } from '../core/constants/constants.js';
+
+
+type Permission = constants.READ | constants.WRITE | constants.DELETE | constants.SHARE | constants.UPLOAD;
 
 interface BaseGroup {
     name: string;
@@ -14,7 +17,7 @@ export interface BaseGroupDB {
     permissions: Permission;
 }
 
-interface GroupDB extends BaseGroupDB{
+interface GroupDB extends BaseGroupDB {
     id: string;
 }
 

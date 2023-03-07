@@ -1,16 +1,22 @@
-import { BaseUser, User } from '../types/user.js';
+import { BaseUser, User, UserAuth, UserDB } from '../types/user.js';
 import { UserRepository } from '../data-access/repositories/userRepository.js';
 import { Utilities } from '../utilities/utilities.js';
+import { UserDataMapper } from '../data-access/mappers/userDataMapper.js';
+import { Model, Transaction } from 'sequelize';
+import { UserModel } from '../data-access/models/userModel.js';
+import { UserGroupRepository } from '../data-access/repositories/userGroupRepository.js';
 
 
 export class UserService {
     private userRepository: UserRepository;
     private readonly model;
     private readonly dataMapper;
-    constructor(userModel: any, userDataMapper: any) {
+    private readonly userGroupRepository;
+    constructor(userModel: typeof UserModel, userDataMapper: UserDataMapper, userGroupRepository: UserGroupRepository) {
         this.model = userModel;
         this.dataMapper = userDataMapper;
-        this.userRepository = new UserRepository(this.model, this.dataMapper);
+        this.userGroupRepository = userGroupRepository;
+        this.userRepository = new UserRepository(this.model, this.userGroupRepository);
     }
 
     async create(user: BaseUser): Promise<User> {
@@ -20,22 +26,38 @@ export class UserService {
             isDeleted: false,
             ...user
         };
-        return this.userRepository.create(newUser);
+        const userToCreate = this.dataMapper.toDalEntity(newUser);
+        const createdUser = await this.userRepository.create(userToCreate);
+        return this.dataMapper.toDomain(createdUser.toJSON());
     }
     async get(id: string): Promise<User | undefined> {
-        const user = await this.userRepository.get(id);
-        if (user && !user.isDeleted) {
-            return user;
+        const userFromDB = await this.userRepository.get(id);
+        if (userFromDB) {
+            const userDTO = this.dataMapper.toDomain(userFromDB.toJSON());
+            return !userDTO.isDeleted ? userDTO : undefined;
         }
     }
     async update(userUpdates: BaseUser, id: string): Promise<User> {
-        return this.userRepository.update(userUpdates, id);
+        const updatedUser = await this.userRepository.update(userUpdates, id);
+        return this.dataMapper.toDomain(updatedUser.toJSON());
     }
-    async delete(id: string, userToDelete: User): Promise<User> {
+    async delete(id: string, userToDelete: User, transaction: Transaction): Promise<User> {
         userToDelete.isDeleted = true;
-        return this.userRepository.delete(id, userToDelete);
+        const userUpdates = this.dataMapper.toDalEntity(userToDelete);
+        const deletedUser = await this.userRepository.delete(id, userUpdates, transaction);
+        return this.dataMapper.toDomain(deletedUser.toJSON());
     }
-    getAutoSuggestUsers(loginSubstring: string, limit: string): Promise<(User | undefined)[]> {
-        return this.userRepository.getAutoSuggestUsers(loginSubstring, limit);
+    async getAutoSuggestUsers(loginSubstring: string, limit: string): Promise<Array<User | undefined>> {
+        const retrievedUsers = await this.userRepository.getAutoSuggestUsers(loginSubstring, limit);
+        return retrievedUsers.map((user: Model<UserDB> | undefined) => {
+            if (user) return this.dataMapper.toDomain(user.toJSON());
+        });
+    }
+    async getByLoginAndPassword(params: UserAuth): Promise<User | undefined> {
+        const userFromDB = await this.userRepository.getByLoginAndPassword(params);
+        if (userFromDB) {
+            const userDTO = this.dataMapper.toDomain(userFromDB.toJSON());
+            return !userDTO.isDeleted ? userDTO : undefined;
+        }
     }
 }
