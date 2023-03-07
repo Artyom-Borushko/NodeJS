@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { BaseUser, UserDB } from '../../types/user.js';
+import { BaseUser, UserAuth, UserDB } from '../../types/user.js';
 import { Model, Op, Transaction } from 'sequelize';
 import { DbError } from '../../core/errors/dbError.js';
 import { BaseRepository } from './baseRepository.js';
@@ -16,6 +16,14 @@ export class UserRepository extends BaseRepository {
 
     async get(id: string, transaction?: Transaction): Promise<Model<UserDB> | undefined> {
         return await super.getEntityById(id, transaction);
+    }
+    async getByLoginAndPassword(params: UserAuth): Promise<Model<UserDB> | undefined> {
+        return await super.getEntityByParams({
+            where: {
+                login: params.login,
+                password: params.password
+            }
+        });
     }
     async create(user: UserDB): Promise<Model<UserDB>> {
         return await super.createEntity(user);

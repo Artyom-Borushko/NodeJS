@@ -11,6 +11,7 @@ import { UserRepository } from '../../data-access/repositories/userRepository.js
 import { UserModel } from '../../data-access/models/userModel.js';
 import { UserGroupModel } from '../../data-access/models/userGroupModel.js';
 import { UserGroupRepository } from '../../data-access/repositories/userGroupRepository.js';
+import { AuthenticationMiddleware } from '../middlewares/authenticationMiddleware.js';
 
 const groupRoute: Router = express.Router();
 const validation = new JoiValidation();
@@ -20,25 +21,32 @@ const groupService = new GroupService(GroupModel, new GroupDataMapper(),
     userGroupRepository);
 const groupController = new GroupController(groupService);
 const attachGroupMiddleware = new AttachGroupMiddleware(groupService);
+const authenticationMiddleware = new AuthenticationMiddleware();
 
 
 groupRoute.route('/')
-    .post(validation.validateSchema(groupValidationSchema),
+    .post(authenticationMiddleware.checkToken,
+        validation.validateSchema(groupValidationSchema),
         groupController.createGroup.bind(groupController)
     )
-    .get(groupController.getAllGroups.bind(groupController));
+    .get(authenticationMiddleware.checkToken,
+        groupController.getAllGroups.bind(groupController));
 
 groupRoute.param('id', attachGroupMiddleware.getGroupById.bind(attachGroupMiddleware));
 
 groupRoute.route('/:id')
-    .get(groupController.getGroup.bind(groupController))
-    .put(validation.validateSchema(groupValidationSchema),
+    .get(authenticationMiddleware.checkToken,
+        groupController.getGroup.bind(groupController))
+    .put(authenticationMiddleware.checkToken,
+        validation.validateSchema(groupValidationSchema),
         groupController.updateGroup.bind(groupController)
     )
-    .delete(groupController.deleteGroup.bind(groupController));
+    .delete(authenticationMiddleware.checkToken,
+        groupController.deleteGroup.bind(groupController));
 
 groupRoute.route('/addUsers')
-    .post(validation.validateSchema(usersToGroupValidationSchema),
+    .post(authenticationMiddleware.checkToken,
+        validation.validateSchema(usersToGroupValidationSchema),
         groupController.addUsersToGroup.bind(groupController)
     );
 
