@@ -13,11 +13,9 @@ import { authenticationConfig } from '../../core/configs/authentication.config.j
 
 
 export class UserController extends BaseController {
-    private userService: UserService;
-
-    constructor(userServiceInjected: UserService) {
+    constructor(private userService: UserService) {
         super();
-        this.userService = userServiceInjected;
+        this.userService = userService;
     }
 
     async createUser(req: RequestWithUser, res: Response, next: NextFunction) {

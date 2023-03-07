@@ -9,11 +9,9 @@ import { Logger } from '../../utilities/logger.js';
 
 
 export class GroupController extends BaseController {
-    private groupService: GroupService;
-
-    constructor(groupServiceInjected: GroupService) {
+    constructor(private groupService: GroupService) {
         super();
-        this.groupService = groupServiceInjected;
+        this.groupService = groupService;
     }
 
     async createGroup(req: RequestWithGroup, res: Response, next: NextFunction) {
@@ -87,10 +85,11 @@ export class GroupController extends BaseController {
     async getAllGroups(req: Request, res: Response, next: NextFunction) {
         try {
             const allGroups = await this.groupService.getAll();
-            if (!allGroups) {
-                throw new EntityNotFoundError('Group can not be found');
-            }
-            this.success(res, allGroups);
+            this.success(res, {
+                data: {
+                    groups: allGroups
+                }
+            });
         } catch (e) {
             Logger.logControllerError('error', 'getAllGroups', 'Unable to get all groups',
                 { req, res, next });
