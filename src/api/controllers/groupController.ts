@@ -5,7 +5,6 @@ import { GroupService } from '../../services/groupService.js';
 import { BaseGroup } from '../../types/group.js';
 import { EntityNotFoundError } from '../../core/errors/entityNotFoundError.js';
 import { InitializeSequelize } from '../../database/postgreSQL/initializeSequelize.js';
-import { Logger } from '../../utilities/logger.js';
 
 
 export class GroupController extends BaseController {
@@ -20,8 +19,8 @@ export class GroupController extends BaseController {
             const createdGroup = await this.groupService.create(group);
             this.success(res, createdGroup);
         } catch (e) {
-            Logger.logControllerError('error', 'createGroup', 'Unable to create group',
-                { req, res, next });
+            this.log.error('Method - createGroup, Message - Unable to create group, Props - %O',
+                [req, res, next]);
             next(e);
             return;
         }
@@ -34,8 +33,8 @@ export class GroupController extends BaseController {
             }
             this.success(res, group);
         } catch (e) {
-            Logger.logControllerError('error', 'getGroup', 'Unable to get group',
-                { req, res, next });
+            this.log.error('Method - getGroup, Message - Unable to get group, Props - %O',
+                [req, res, next]);
             next(e);
             return;
         }
@@ -47,8 +46,8 @@ export class GroupController extends BaseController {
             const updatedGroup = await this.groupService.update(groupUpdates, id);
             this.success(res, updatedGroup);
         } catch (e) {
-            Logger.logControllerError('error', 'updateGroup', 'Unable to update group',
-                { req, res, next });
+            this.log.error('Method - updateGroup, Message - Unable to update group, Props - %O',
+                [req, res, next]);
             next(e);
             return;
         }
@@ -60,8 +59,8 @@ export class GroupController extends BaseController {
             await this.groupService.delete(id);
             this.success(res, groupToDelete!);
         } catch (e) {
-            Logger.logControllerError('error', 'deleteGroup', 'Unable to delete group',
-                { req, res, next });
+            this.log.error('Method - deleteGroup, Message - Unable to delete group, Props - %O',
+                [req, res, next]);
             next(e);
             return;
         }
@@ -75,8 +74,8 @@ export class GroupController extends BaseController {
             await transaction.commit();
             this.success(res, group);
         } catch (e) {
-            Logger.logControllerError('error', 'addUsersToGroup', 'Unable to add users to group',
-                { req, res, next });
+            this.log.error('Method - addUsersToGroup, Message - Unable to add users to group, Props - %O',
+                [req, res, next]);
             await transaction.rollback();
             next(e);
             return;
@@ -91,8 +90,8 @@ export class GroupController extends BaseController {
                 }
             });
         } catch (e) {
-            Logger.logControllerError('error', 'getAllGroups', 'Unable to get all groups',
-                { req, res, next });
+            this.log.error('Method - getAllGroups, Message - Unable to get all groups, Props - %O',
+                [req, res, next]);
             next(e);
             return;
         }
