@@ -6,9 +6,13 @@ import { InitializeSequelize } from './database/postgreSQL/initializeSequelize.j
 import 'dotenv/config';
 import { errorHandler } from './api/middlewares/error-handlers/errorHandler.js';
 import { EntityRelationshipsInitializer } from './database/postgreSQL/entityRelationshipsInitializer.js';
+import { LoggerMiddleware } from './api/middlewares/loggerMiddleware.js';
+import { UnhandledExceptionsHandler } from './api/middlewares/error-handlers/unhandledExceptionsHandler.js';
 
 
 const resourceNotFoundHandler = new ResourceNotFoundHandler().notFoundHandler;
+const serviceMethodsLogger = new LoggerMiddleware().serviceMethodsLogger;
+const unhandledErrorsHandler = new UnhandledExceptionsHandler().listenForUnhandledExceptions;
 const app: Express = express();
 
 
@@ -24,6 +28,8 @@ InitializeSequelize.getInstance().authenticate()
     });
 
 app.use(express.json());
+app.use(unhandledErrorsHandler);
+app.use(serviceMethodsLogger);
 app.use('/users', userRoute);
 app.use('/groups', groupRoute);
 

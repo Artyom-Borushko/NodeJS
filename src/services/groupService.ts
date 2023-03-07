@@ -1,18 +1,31 @@
 import { Utilities } from '../utilities/utilities.js';
 import { GroupRepository } from '../data-access/repositories/groupRepository.js';
 import { GroupDataMapper } from '../data-access/mappers/groupDataMapper.js';
-import { BaseGroup, Group } from '../types/group.js';
+import { BaseGroup, Group, GroupDB } from '../types/group.js';
+import { Model, Transaction } from 'sequelize';
+import { GroupModel } from '../data-access/models/groupModel.js';
+import { UserRepository } from '../data-access/repositories/userRepository.js';
+import { UserGroupModel } from '../data-access/models/userGroupModel.js';
+import { UserGroupRepository } from '../data-access/repositories/userGroupRepository.js';
 
 
 export class GroupService {
     private groupRepository: GroupRepository;
     private readonly model;
     private readonly dataMapper;
+    private readonly userRepository;
+    private readonly userGroupModel;
+    private readonly userGroupRepository;
 
-    constructor(groupModel: any, groupDataMapper: GroupDataMapper) {
+    constructor(groupModel: typeof GroupModel, groupDataMapper: GroupDataMapper, userRepository: UserRepository,
+        userGroupModel: typeof UserGroupModel, userGroupRepository: UserGroupRepository) {
         this.model = groupModel;
         this.dataMapper = groupDataMapper;
-        this.groupRepository = new GroupRepository(this.model, this.dataMapper);
+        this.userRepository = userRepository;
+        this.userGroupModel = userGroupModel;
+        this.userGroupRepository = userGroupRepository;
+        this.groupRepository = new GroupRepository(this.model, this.userRepository, this.userGroupModel,
+            this.userGroupRepository);
     }
 
     async create(group: BaseGroup): Promise<Group> {
@@ -21,21 +34,30 @@ export class GroupService {
             id: uuid,
             ...group
         };
-        return this.groupRepository.create(newGroup);
+        const groupToCreate = this.dataMapper.toDalEntity(newGroup);
+        const createdGroup = await this.groupRepository.create(groupToCreate);
+        return this.dataMapper.toDomain(createdGroup.toJSON());
     }
     async get(id: string): Promise<Group | undefined> {
-        return await this.groupRepository.get(id);
+        const groupFromDB = await this.groupRepository.get(id);
+        return groupFromDB ? this.dataMapper.toDomain(groupFromDB.toJSON()) : undefined;
     }
     async getAll(): Promise<Array<Group | undefined>> {
-        return await this.groupRepository.getAll();
+        const groupsFromDB = await this.groupRepository.getAll();
+        return groupsFromDB.map((group: Model<GroupDB> | undefined) => {
+            if (group) return this.dataMapper.toDomain(group.toJSON());
+        });
     }
     async update(groupUpdates: BaseGroup, id: string): Promise<Group> {
-        return this.groupRepository.update(groupUpdates, id);
+        const groupToUpdate = this.dataMapper.toDalEntity(groupUpdates);
+        const updatedGroup = await this.groupRepository.update(groupToUpdate, id);
+        return this.dataMapper.toDomain(updatedGroup.toJSON());
     }
-    async delete(id: string, groupToDelete: Group): Promise<Group> {
-        return this.groupRepository.delete(id, groupToDelete);
+    async delete(id: string): Promise<void> {
+        return await this.groupRepository.delete(id);
     }
-    async addUsersToGroup(groupId: string, userIds: Array<string>): Promise<Group | undefined> {
-        return this.groupRepository.addUsersToGroup(groupId, userIds);
+    async addUsersToGroup(groupId: string, userIds: Array<string>, transaction: Transaction): Promise<Group> {
+        const groupFromDB = await this.groupRepository.addUsersToGroup(groupId, userIds, transaction);
+        return this.dataMapper.toDomain(groupFromDB.toJSON());
     }
 }
