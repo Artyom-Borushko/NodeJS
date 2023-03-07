@@ -8,8 +8,6 @@ import { errorHandler } from './api/middlewares/error-handlers/errorHandler.js';
 import { EntityRelationshipsInitializer } from './database/postgreSQL/entityRelationshipsInitializer.js';
 import { LoggerMiddleware } from './api/middlewares/loggerMiddleware.js';
 import { UnhandledExceptionsHandler } from './api/middlewares/error-handlers/unhandledExceptionsHandler.js';
-import cors from 'cors';
-import { corsConfig } from './core/configs/cors.config.js';
 
 
 const resourceNotFoundHandler = new ResourceNotFoundHandler().notFoundHandler;
@@ -29,7 +27,6 @@ InitializeSequelize.getInstance().authenticate()
         throw 'DB connection error';
     });
 
-app.use(cors(corsConfig));
 app.use(express.json());
 app.use(unhandledErrorsHandler);
 app.use(serviceMethodsLogger);

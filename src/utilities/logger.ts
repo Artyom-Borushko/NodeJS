@@ -1,4 +1,4 @@
-import { loggerConfig } from '../core/configs/logger.config.js';
+import { loggerConfig } from './logger.config.js';
 
 
 export class Logger {

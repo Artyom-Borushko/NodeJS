@@ -1,4 +1,4 @@
-import { loggerConfig } from '../../core/configs/logger.config.js';
+import { loggerConfig } from '../../utilities/logger.config.js';
 import { NextFunction, Request, Response } from 'express';
 
 
