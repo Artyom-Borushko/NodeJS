@@ -8,7 +8,6 @@ import { EntityNotFoundError } from '../../core/errors/entityNotFoundError.js';
 import { InitializeSequelize } from '../../database/postgreSQL/initializeSequelize.js';
 import { UnauthorizedError } from '../../core/errors/unauthorizedError.js';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { authenticationConfig } from '../../core/configs/authentication.config.js';
 
 
 export class UserController extends BaseController {
@@ -104,7 +103,7 @@ export class UserController extends BaseController {
                 throw new UnauthorizedError('Invalid username or password');
             }
             const payload: JwtPayload = { sub: user.id };
-            const token = jwt.sign(payload, authenticationConfig.secret, { expiresIn: authenticationConfig.tokenLife });
+            const token = jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: Number(process.env.JWT_TOKEN_LIFE) });
             res.json({ token });
         } catch (e) {
             next(e);
