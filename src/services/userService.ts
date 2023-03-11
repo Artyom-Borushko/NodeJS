@@ -1,10 +1,10 @@
-import { BaseUser, User, UserAuth, UserDB } from '../types/user.js';
-import { UserRepository } from '../data-access/repositories/userRepository.js';
-import { Utilities } from '../utilities/utilities.js';
-import { UserDataMapper } from '../data-access/mappers/userDataMapper.js';
+import { BaseUser, User, UserAuth, UserDB } from '../types/user';
+import { UserRepository } from '../data-access/repositories/userRepository';
+import { Utilities } from '../utilities/utilities';
+import { UserDataMapper } from '../data-access/mappers/userDataMapper';
 import { Model, Transaction } from 'sequelize';
-import { UserModel } from '../data-access/models/userModel.js';
-import { UserGroupRepository } from '../data-access/repositories/userGroupRepository.js';
+import { UserModel } from '../data-access/models/userModel';
+import { UserGroupRepository } from '../data-access/repositories/userGroupRepository';
 
 
 export class UserService {

@@ -1,5 +1,5 @@
-import { EntityDataMapper } from './entityDataMapper.js';
-import { BaseGroup, Group, GroupDB, Permission } from '../../types/group.js';
+import { EntityDataMapper } from './entityDataMapper';
+import { BaseGroup, Group, GroupDB, Permission } from '../../types/group';
 
 
 export class GroupDataMapper extends EntityDataMapper {

@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-vars */
-import { BaseUser, UserAuth, UserDB } from '../../types/user.js';
+import { BaseUser, UserAuth, UserDB } from '../../types/user';
 import { Model, Op, Transaction } from 'sequelize';
-import { DbError } from '../../core/errors/dbError.js';
-import { BaseRepository } from './baseRepository.js';
-import { UserModel } from '../models/userModel.js';
-import { UserGroupRepository } from './userGroupRepository.js';
+import { DbError } from '../../core/errors/dbError';
+import { BaseRepository } from './baseRepository';
+import { UserModel } from '../models/userModel';
+import { UserGroupRepository } from './userGroupRepository';
 
 
 export class UserRepository extends BaseRepository {

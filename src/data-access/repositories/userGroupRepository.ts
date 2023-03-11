@@ -1,6 +1,6 @@
-import { UserGroupModel } from '../models/userGroupModel.js';
+import { UserGroupModel } from '../models/userGroupModel';
 import { Transaction } from 'sequelize';
-import { BaseRepository } from './baseRepository.js';
+import { BaseRepository } from './baseRepository';
 
 
 export class UserGroupRepository extends BaseRepository {

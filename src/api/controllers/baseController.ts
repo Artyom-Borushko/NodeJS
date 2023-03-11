@@ -1,6 +1,6 @@
 import { Response } from 'express';
-import { constants } from '../../core/constants/constants.js';
-import { loggerConfig } from '../../core/configs/logger.config.js';
+import { constants } from '../../core/constants/constants';
+import { loggerConfig } from '../../core/configs/logger.config';
 
 
 export class BaseController {

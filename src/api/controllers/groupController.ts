@@ -1,10 +1,10 @@
-import { BaseController } from './baseController.js';
-import { AddUsersToGroupRequest, RequestWithGroup } from '../../types/requests.js';
+import { BaseController } from './baseController';
+import { AddUsersToGroupRequest, RequestWithGroup } from '../../types/requests';
 import { NextFunction, Request, Response } from 'express';
-import { GroupService } from '../../services/groupService.js';
-import { BaseGroup } from '../../types/group.js';
-import { EntityNotFoundError } from '../../core/errors/entityNotFoundError.js';
-import { InitializeSequelize } from '../../database/postgreSQL/initializeSequelize.js';
+import { GroupService } from '../../services/groupService';
+import { BaseGroup } from '../../types/group';
+import { EntityNotFoundError } from '../../core/errors/entityNotFoundError';
+import { InitializeSequelize } from '../../database/postgreSQL/initializeSequelize';
 
 
 export class GroupController extends BaseController {

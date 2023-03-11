@@ -1,12 +1,12 @@
-import { DbError } from '../../core/errors/dbError.js';
-import { BaseGroupDB, GroupDB } from '../../types/group.js';
-import { UserModel } from '../models/userModel.js';
+import { DbError } from '../../core/errors/dbError';
+import { BaseGroupDB, GroupDB } from '../../types/group';
+import { UserModel } from '../models/userModel';
 import { Model, Transaction } from 'sequelize';
-import { BaseRepository } from './baseRepository.js';
-import { UserRepository } from './userRepository.js';
-import { GroupModel } from '../models/groupModel.js';
-import { UserGroupModel } from '../models/userGroupModel.js';
-import { UserGroupRepository } from './userGroupRepository.js';
+import { BaseRepository } from './baseRepository';
+import { UserRepository } from './userRepository';
+import { GroupModel } from '../models/groupModel';
+import { UserGroupModel } from '../models/userGroupModel';
+import { UserGroupRepository } from './userGroupRepository';
 
 
 export class GroupRepository extends BaseRepository {

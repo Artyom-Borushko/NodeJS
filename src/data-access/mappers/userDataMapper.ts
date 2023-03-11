@@ -1,5 +1,5 @@
-import { EntityDataMapper } from './entityDataMapper.js';
-import { User, UserDB } from '../../types/user.js';
+import { EntityDataMapper } from './entityDataMapper';
+import { User, UserDB } from '../../types/user';
 
 
 export class UserDataMapper extends EntityDataMapper {

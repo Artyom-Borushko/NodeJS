@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "build": "rimraf ./dist && npx tsc",
     "watch": "npx tsc --watch",
@@ -11,7 +10,8 @@
     "run:dev": "npx nodemon",
     "lint": "npx eslint src/**/*",
     "lint:fix": "npx eslint ./src/**/* --fix",
-    "initPostgreDBTable": "npm run build && node ./dist/src/database/postgreSQL/usersTableInitializer.js"
+    "initPostgreDBTable": "npm run build && node ./dist/src/database/postgreSQL/usersTableInitializer.js",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -26,16 +26,21 @@
   "devDependencies": {
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.15",
+    "@types/jest": "^29.4.0",
     "@types/jsonwebtoken": "^9.0.1",
     "@types/node": "^18.11.17",
     "@types/pg": "^8.6.6",
+    "@types/sinon": "^10.0.13",
     "@typescript-eslint/eslint-plugin": "^5.47.0",
     "@typescript-eslint/parser": "^5.47.0",
     "eslint": "^8.30.0",
+    "jest": "^29.5.0",
     "nodemon": "^2.0.20",
     "rimraf": "^3.0.2",
+    "sinon": "^15.0.1",
+    "ts-jest": "^29.0.5",
     "ts-node": "^10.9.1",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.5"
   },
   "dependencies": {
     "cors": "^2.8.5",

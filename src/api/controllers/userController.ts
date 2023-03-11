@@ -1,12 +1,12 @@
-import { ReqQuery, RequestWithUser } from '../../types/requests.js';
+import { ReqQuery, RequestWithUser } from '../../types/requests';
 import { NextFunction, Request, Response } from 'express';
-import { UserService } from '../../services/userService.js';
-import { BaseUser } from '../../types/user.js';
-import { BaseController } from './baseController.js';
-import { UserDataMapper } from '../../data-access/mappers/userDataMapper.js';
-import { EntityNotFoundError } from '../../core/errors/entityNotFoundError.js';
-import { InitializeSequelize } from '../../database/postgreSQL/initializeSequelize.js';
-import { UnauthorizedError } from '../../core/errors/unauthorizedError.js';
+import { UserService } from '../../services/userService';
+import { BaseUser } from '../../types/user';
+import { BaseController } from './baseController';
+import { UserDataMapper } from '../../data-access/mappers/userDataMapper';
+import { EntityNotFoundError } from '../../core/errors/entityNotFoundError';
+import { InitializeSequelize } from '../../database/postgreSQL/initializeSequelize';
+import { UnauthorizedError } from '../../core/errors/unauthorizedError';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
 
