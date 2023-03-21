@@ -1,7 +1,6 @@
 import sinon from 'sinon';
 import { RequestWithGroup } from '../../../src/types/requests';
 import { NextFunction, Response } from 'express';
-import { Group } from '../../../src/types/group';
 import { UserModel } from '../../../src/data-access/models/userModel';
 import { UserGroupRepository } from '../../../src/data-access/repositories/userGroupRepository';
 import { UserGroupModel } from '../../../src/data-access/models/userGroupModel';
@@ -12,6 +11,10 @@ import { UserRepository } from '../../../src/data-access/repositories/userReposi
 import { GroupController } from '../../../src/api/controllers/groupController';
 import { EntityNotFoundError } from '../../../src/core/errors/entityNotFoundError';
 import { InitializeSequelize } from '../../../src/database/postgreSQL/initializeSequelize';
+import { mockRequest, mockResponse, mockNextFn } from '../../data/common/HTTPMocks';
+import { mockTransaction } from '../../data/common/DBMocks';
+import { mockGroups } from '../../data/groupMocks';
+
 
 describe('Group controller tests', () => {
     let mockReq: RequestWithGroup;
@@ -20,50 +23,6 @@ describe('Group controller tests', () => {
     let userGroupRepository: UserGroupRepository;
     let groupService: GroupService;
     let groupController: GroupController;
-    const mockGroups: Array<Group> = [
-        {
-            id: '887bfcb7-87c6-40d2-a882-5bb8580d783b',
-            name: 'testgroupname5',
-            permissions: [
-                'READ',
-                'UPLOAD_FILES'
-            ]
-        },
-        {
-            id: 'f5f6ecaa-3208-4df7-b49b-710bc82d9e79',
-            name: 'testgroupname',
-            permissions: [
-                'READ',
-                'DELETE'
-            ]
-        }
-    ];
-
-    function mockRequest() {
-        const req = {} as RequestWithGroup;
-        req.body = jest.fn().mockReturnValue(req);
-        req.params = jest.fn().mockReturnValue(req) as any;
-        req.query = jest.fn().mockReturnValue(req) as any;
-        return req;
-    }
-    function mockResponse() {
-        const res = {} as Response;
-        res.send = jest.fn().mockReturnValue(res);
-        res.json = jest.fn().mockReturnValue(res);
-        res.status = jest.fn().mockReturnValue(res);
-        return res;
-    }
-    function mockNextFn() {
-        const next = jest.fn().mockReturnValue('NEXT');
-        return next as NextFunction;
-    }
-    function mockTransaction() {
-        const transactionObj = {} as any;
-        transactionObj.commit = jest.fn().mockReturnValue('commit');
-        transactionObj.transaction = jest.fn().mockReturnValue('transaction');
-        transactionObj.rollback = jest.fn().mockReturnValue('rollback');
-        return transactionObj;
-    }
 
     beforeEach(() => {
         mockReq = mockRequest();

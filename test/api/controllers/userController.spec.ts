@@ -7,11 +7,13 @@ import { UserGroupRepository } from '../../../src/data-access/repositories/userG
 import { UserGroupModel } from '../../../src/data-access/models/userGroupModel';
 import { RequestWithUser } from '../../../src/types/requests';
 import { NextFunction, Response } from 'express';
-import { User } from '../../../src/types/user';
 import { EntityNotFoundError } from '../../../src/core/errors/entityNotFoundError';
 import { InitializeSequelize } from '../../../src/database/postgreSQL/initializeSequelize';
 import jwt from 'jsonwebtoken';
 import { UnauthorizedError } from '../../../src/core/errors/unauthorizedError';
+import { mockRequest, mockResponse, mockNextFn } from '../../data/common/HTTPMocks';
+import { mockTransaction } from '../../data/common/DBMocks';
+import { mockUsers } from '../../data/userMocks';
 
 
 describe('User controller tests', () => {
@@ -20,48 +22,6 @@ describe('User controller tests', () => {
     let mockNext: NextFunction;
     let userService: UserService;
     let userController: UserController;
-    const mockUsers: Array<User> = [
-        {
-            isDeleted: false,
-            id: '07931aff-4470-492a-b5d8-0736a282e10d',
-            age: 60,
-            password: 'corspass',
-            login: 'corslogin@gmail.com'
-        },
-        {
-            isDeleted: false,
-            id: '8dd74999-2be8-4954-bed8-041ca82f58e7',
-            age: 58,
-            password: 'testpassE1',
-            login: 'testloginG111@gmail.com'
-        }
-    ];
-
-    function mockRequest() {
-        const req = {} as RequestWithUser;
-        req.body = jest.fn().mockReturnValue(req);
-        req.params = jest.fn().mockReturnValue(req) as any;
-        req.query = jest.fn().mockReturnValue(req) as any;
-        return req;
-    }
-    function mockResponse() {
-        const res = {} as Response;
-        res.send = jest.fn().mockReturnValue(res);
-        res.json = jest.fn().mockReturnValue(res);
-        res.status = jest.fn().mockReturnValue(res);
-        return res;
-    }
-    function mockNextFn() {
-        const next = jest.fn().mockReturnValue('NEXT');
-        return next as NextFunction;
-    }
-    function mockTransaction() {
-        const transactionObj = {} as any;
-        transactionObj.commit = jest.fn().mockReturnValue('commit');
-        transactionObj.transaction = jest.fn().mockReturnValue('transaction');
-        transactionObj.rollback = jest.fn().mockReturnValue('rollback');
-        return transactionObj;
-    }
 
     beforeEach(() => {
         mockReq = mockRequest();
