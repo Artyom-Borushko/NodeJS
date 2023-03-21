@@ -29,12 +29,16 @@ async function addMockUsers(): Promise<void> {
     }
 }
 
-try {
-    await client.connect();
-    await initializeTable();
-    await addMockUsers();
-    await client.end();
-} catch (e) {
-    console.error('Error creating table with mock users:', e);
-    await client.end();
+async function start() {
+    try {
+        await client.connect();
+        await initializeTable();
+        await addMockUsers();
+        await client.end();
+    } catch (e) {
+        console.error('Error creating table with mock users:', e);
+        await client.end();
+    }
 }
+
+start();

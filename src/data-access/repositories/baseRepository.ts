@@ -1,4 +1,4 @@
-import { DbError } from '../../core/errors/dbError.js';
+import { DbError } from '../../core/errors/dbError';
 import { Model, Transaction } from 'sequelize';
 
 

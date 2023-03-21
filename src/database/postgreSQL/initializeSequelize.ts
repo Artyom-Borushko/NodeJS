@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize';
-import { sequelizeConnectionString } from './db.config.js';
+import { sequelizeConnectionString } from './db.config';
 
 
 export class InitializeSequelize {

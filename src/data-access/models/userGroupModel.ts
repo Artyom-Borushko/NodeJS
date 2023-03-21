@@ -1,7 +1,7 @@
 import { Model, InferAttributes, InferCreationAttributes, DataTypes } from 'sequelize';
-import { InitializeSequelize } from '../../database/postgreSQL/initializeSequelize.js';
-import { UserModel } from './userModel.js';
-import { GroupModel } from './groupModel.js';
+import { InitializeSequelize } from '../../database/postgreSQL/initializeSequelize';
+import { UserModel } from './userModel';
+import { GroupModel } from './groupModel';
 
 
 export class UserGroupModel extends Model<InferAttributes<UserGroupModel>, InferCreationAttributes<UserGroupModel>> {

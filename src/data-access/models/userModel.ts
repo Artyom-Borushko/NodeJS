@@ -1,5 +1,5 @@
 import { Model, InferAttributes, InferCreationAttributes, DataTypes } from 'sequelize';
-import { InitializeSequelize } from '../../database/postgreSQL/initializeSequelize.js';
+import { InitializeSequelize } from '../../database/postgreSQL/initializeSequelize';
 
 
 export class UserModel extends Model<InferAttributes<UserModel>, InferCreationAttributes<UserModel>> {

@@ -3,7 +3,6 @@ import { NextFunction, Response } from 'express';
 import { UnauthorizedError } from '../../core/errors/unauthorizedError.js';
 import jwt from 'jsonwebtoken';
 import { ForbiddenError } from '../../core/errors/forbiddenError.js';
-import { authenticationConfig } from '../../core/configs/authentication.config.js';
 
 
 export class AuthenticationMiddleware {
@@ -14,7 +13,7 @@ export class AuthenticationMiddleware {
                 throw new UnauthorizedError('No token provided');
             }
             if (typeof token === 'string') {
-                jwt.verify(token, authenticationConfig.secret, (err) => {
+                jwt.verify(token, process.env.JWT_SECRET as string, (err) => {
                     if (err) {
                         throw new ForbiddenError('Failed authenticate token');
                     }

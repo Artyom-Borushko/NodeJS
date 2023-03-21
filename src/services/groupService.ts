@@ -1,12 +1,12 @@
-import { Utilities } from '../utilities/utilities.js';
-import { GroupRepository } from '../data-access/repositories/groupRepository.js';
-import { GroupDataMapper } from '../data-access/mappers/groupDataMapper.js';
-import { BaseGroup, Group, GroupDB } from '../types/group.js';
+import { Utilities } from '../utilities/utilities';
+import { GroupRepository } from '../data-access/repositories/groupRepository';
+import { GroupDataMapper } from '../data-access/mappers/groupDataMapper';
+import { BaseGroup, Group, GroupDB } from '../types/group';
 import { Model, Transaction } from 'sequelize';
-import { GroupModel } from '../data-access/models/groupModel.js';
-import { UserRepository } from '../data-access/repositories/userRepository.js';
-import { UserGroupModel } from '../data-access/models/userGroupModel.js';
-import { UserGroupRepository } from '../data-access/repositories/userGroupRepository.js';
+import { GroupModel } from '../data-access/models/groupModel';
+import { UserRepository } from '../data-access/repositories/userRepository';
+import { UserGroupModel } from '../data-access/models/userGroupModel';
+import { UserGroupRepository } from '../data-access/repositories/userGroupRepository';
 
 
 export class GroupService {

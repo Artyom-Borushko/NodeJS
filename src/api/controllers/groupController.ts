@@ -1,19 +1,16 @@
-import { BaseController } from './baseController.js';
-import { AddUsersToGroupRequest, RequestWithGroup } from '../../types/requests.js';
+import { BaseController } from './baseController';
+import { AddUsersToGroupRequest, RequestWithGroup } from '../../types/requests';
 import { NextFunction, Request, Response } from 'express';
-import { GroupService } from '../../services/groupService.js';
-import { BaseGroup } from '../../types/group.js';
-import { EntityNotFoundError } from '../../core/errors/entityNotFoundError.js';
-import { InitializeSequelize } from '../../database/postgreSQL/initializeSequelize.js';
-import { Logger } from '../../utilities/logger.js';
+import { GroupService } from '../../services/groupService';
+import { BaseGroup } from '../../types/group';
+import { EntityNotFoundError } from '../../core/errors/entityNotFoundError';
+import { InitializeSequelize } from '../../database/postgreSQL/initializeSequelize';
 
 
 export class GroupController extends BaseController {
-    private groupService: GroupService;
-
-    constructor(groupServiceInjected: GroupService) {
+    constructor(private groupService: GroupService) {
         super();
-        this.groupService = groupServiceInjected;
+        this.groupService = groupService;
     }
 
     async createGroup(req: RequestWithGroup, res: Response, next: NextFunction) {
@@ -22,8 +19,8 @@ export class GroupController extends BaseController {
             const createdGroup = await this.groupService.create(group);
             this.success(res, createdGroup);
         } catch (e) {
-            Logger.logControllerError('error', 'createGroup', 'Unable to create group',
-                { req, res, next });
+            this.log.error('Method - createGroup, Message - Unable to create group, Props - %O',
+                [req, res, next]);
             next(e);
             return;
         }
@@ -36,8 +33,8 @@ export class GroupController extends BaseController {
             }
             this.success(res, group);
         } catch (e) {
-            Logger.logControllerError('error', 'getGroup', 'Unable to get group',
-                { req, res, next });
+            this.log.error('Method - getGroup, Message - Unable to get group, Props - %O',
+                [req, res, next]);
             next(e);
             return;
         }
@@ -49,8 +46,8 @@ export class GroupController extends BaseController {
             const updatedGroup = await this.groupService.update(groupUpdates, id);
             this.success(res, updatedGroup);
         } catch (e) {
-            Logger.logControllerError('error', 'updateGroup', 'Unable to update group',
-                { req, res, next });
+            this.log.error('Method - updateGroup, Message - Unable to update group, Props - %O',
+                [req, res, next]);
             next(e);
             return;
         }
@@ -62,8 +59,8 @@ export class GroupController extends BaseController {
             await this.groupService.delete(id);
             this.success(res, groupToDelete!);
         } catch (e) {
-            Logger.logControllerError('error', 'deleteGroup', 'Unable to delete group',
-                { req, res, next });
+            this.log.error('Method - deleteGroup, Message - Unable to delete group, Props - %O',
+                [req, res, next]);
             next(e);
             return;
         }
@@ -77,8 +74,8 @@ export class GroupController extends BaseController {
             await transaction.commit();
             this.success(res, group);
         } catch (e) {
-            Logger.logControllerError('error', 'addUsersToGroup', 'Unable to add users to group',
-                { req, res, next });
+            this.log.error('Method - addUsersToGroup, Message - Unable to add users to group, Props - %O',
+                [req, res, next]);
             await transaction.rollback();
             next(e);
             return;
@@ -87,13 +84,14 @@ export class GroupController extends BaseController {
     async getAllGroups(req: Request, res: Response, next: NextFunction) {
         try {
             const allGroups = await this.groupService.getAll();
-            if (!allGroups) {
-                throw new EntityNotFoundError('Group can not be found');
-            }
-            this.success(res, allGroups);
+            this.success(res, {
+                data: {
+                    groups: allGroups
+                }
+            });
         } catch (e) {
-            Logger.logControllerError('error', 'getAllGroups', 'Unable to get all groups',
-                { req, res, next });
+            this.log.error('Method - getAllGroups, Message - Unable to get all groups, Props - %O',
+                [req, res, next]);
             next(e);
             return;
         }
